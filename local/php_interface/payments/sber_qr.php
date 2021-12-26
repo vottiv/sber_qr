@@ -31,9 +31,6 @@ class SberQR
      */
     const URL_API_ORDER_STATUS = 'https://api.sberbank.ru/ru/prod/order/v1/status';
 
-    /**
-     * @var string
-     */
     private $id_qr = '*****';
 
     /**

@@ -51,4 +51,13 @@ class File
         rmdir($dir);
     }
     
+    public function getFileFullUrl($id) 
+    {
+        $path = \CFile::GetPath($id);
+        if (!empty($path)) {
+            $result = 'https://site.ru' . $path;
+        }
+        return $result ?? null;
+    }
+
 }

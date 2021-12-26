@@ -6,10 +6,9 @@ if (!defined('B_PROLOG_INCLUDED') || B_PROLOG_INCLUDED !== true) {
 
 use Bitrix\Main\Application;
 use Bitrix\Sale\Order;
-use Citfact\SiteCore\Api\Helper;
-use Citfact\SiteCore\Core;
 use QRcode;
-use Citfact\SiteCore\Sber\SberQR;
+use Payment\SberQR;
+use Helper\File;
 
 class PageSberQR extends \CBitrixComponent
 {
@@ -24,8 +23,9 @@ class PageSberQR extends \CBitrixComponent
         $request = Application::getInstance()->getContext()->getRequest()->toArray();
         $order = Order::load($request['ID']);
 
+        $idProp = '';
         $propertyCollection = $order->getPropertyCollection();
-        $orderIdSber = $propertyCollection->getItemByOrderPropertyId(Core::ID_PROPERTY_ORDER_QR);
+        $orderIdSber = $propertyCollection->getItemByOrderPropertyId($idProp);
         $payment = $order->getPaymentCollection()[0];
         $this->arResult['PAYED'] = $order->getField('PAYED');
 
@@ -40,12 +40,10 @@ class PageSberQR extends \CBitrixComponent
         if ($orderStatus['error_code'] == '000000' && $orderStatus['order_operation_params'][0]['operation_type'] == 'PAY') {
             // Проводим оплату
             $payment->setPaid('Y');
-
             // Убираем внешний идентификатор
             if (count($orderIdSber->getValue()) > 0) {
                 $orderIdSber->setValue('');
                 $order->save();
-
                 // Заказ оплачен - отправим в карточку заказа
                 LocalRedirect('/account/orders-history/order_detail.php?ID=' . $request['ID']);
             }
@@ -72,7 +70,8 @@ class PageSberQR extends \CBitrixComponent
             $saveandprint = false
         );
 
-        $this->arResult['QR_CODE'] = Helper::getFileFullUrl(
+        // Ссылка на файл с кодом для вывода в шаблоне
+        $this->arResult['QR_CODE'] = File::getFileFullUrl(
             \CFile::SaveFile(
                 \CFile::MakeFileArray($outfile),
                 'sberqr'
@@ -96,7 +95,7 @@ class PageSberQR extends \CBitrixComponent
     // Удаляем старые коды из папки /upload/sberqr/
     public static function deleteOldQrCodes()
     {
-        return (new Helper\File())->cleanLogs($this->dir);
+        return (new File())->cleanLogs($this->dir);
     }
 
 }
