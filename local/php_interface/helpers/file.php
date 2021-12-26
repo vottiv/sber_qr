@@ -13,7 +13,7 @@ class File
         $this->day = 60 * 60 * 24 * $day;
     }
 
-    public function cleanFiles(string $path)
+    public function clear(string $path)
     {
         $date_1 = time();
 

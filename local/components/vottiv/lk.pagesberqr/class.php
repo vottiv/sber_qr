@@ -95,7 +95,7 @@ class PageSberQR extends \CBitrixComponent
     // Удаляем старые коды из папки /upload/sberqr/
     public static function deleteOldQrCodes()
     {
-        return (new File())->cleanLogs($this->dir);
+        return (new File())->clear($this->dir);
     }
 
 }
